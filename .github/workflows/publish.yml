@@ -1,0 +1,35 @@
+name: Publish
+
+# Publishes the pure-Dart contract package. No native builds needed.
+# Tag as v<version>, e.g. v0.1.0 (must match pubspec.yaml). Requires
+# pub.dev trusted publishing (OIDC) configured for haudiotagger_interface.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to pub.dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+      - name: Verify tag matches pubspec
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          PUBSPEC=$(grep -oP '^version: \K\d+\.\d+\.\d+' pubspec.yaml)
+          test "$VERSION" = "$PUBSPEC" || \
+            (echo "Tag $VERSION != pubspec $PUBSPEC" && exit 1)
+      - run: dart pub get
+      - run: dart analyze --fatal-infos
+      - run: dart test
+      - run: dart pub publish --force

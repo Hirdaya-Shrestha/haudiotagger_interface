@@ -1,0 +1,4 @@
+# Pure-Dart contract package: analyzer defaults are enough here.
+analyzer:
+  language:
+    strict-casts: true

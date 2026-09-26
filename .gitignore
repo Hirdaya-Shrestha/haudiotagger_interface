@@ -1,0 +1,6 @@
+.dart_tool/
+.packages
+build/
+.pub/
+pubspec.lock
+.fvm/

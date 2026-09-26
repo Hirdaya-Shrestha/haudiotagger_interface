@@ -1,0 +1,4 @@
+build/
+.dart_tool/
+.git/
+pubspec.lock
