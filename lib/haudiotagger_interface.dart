@@ -17,9 +17,23 @@ class AudioFingerprint {
 
 /// Implemented by fingerprint providers (e.g. `haudiotagger_fingerprint`).
 abstract interface class FingerprintBackend {
-  Future<AudioFingerprint> fingerprint(String path);
-  Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes);
+  Future<AudioFingerprint> fingerprint(String path,
+      {CancellationToken? cancellationToken});
+  Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes,
+      {CancellationToken? cancellationToken});
   Future<double> similarity(AudioFingerprint a, AudioFingerprint b);
+}
+
+/// Cooperative cancellation handle for long fingerprint scans.
+///
+/// Obtain instances from the provider package — do not implement this
+/// yourself. Backends accept only the provider's token and reject anything
+/// else with an [ArgumentError], so a foreign implementation can never
+/// silently run uncancelled.
+abstract interface class CancellationToken {
+  /// Trip the token. In-flight work observing it aborts; safe to call
+  /// multiple times.
+  Future<void> cancel();
 }
 
 /// Global slot for the active backend.
@@ -44,10 +58,13 @@ class _UnimplementedBackend implements FingerprintBackend {
         'Haudiotagger.fingerprint().',
       );
   @override
-  Future<AudioFingerprint> fingerprint(String path) async => _throw();
+  Future<AudioFingerprint> fingerprint(String path,
+          {CancellationToken? cancellationToken}) async =>
+      _throw();
 
   @override
-  Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes) async =>
+  Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes,
+          {CancellationToken? cancellationToken}) async =>
       _throw();
 
   @override

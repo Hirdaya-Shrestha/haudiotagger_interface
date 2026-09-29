@@ -1,3 +1,9 @@
+## 0.2.0
+
+### Features
+
+- `CancellationToken` contract for cooperative scan cancellation; `FingerprintBackend.fingerprint` and `fingerprintFromBytes` accept it as an optional parameter. Providers accept only their own token and reject foreign ones with `ArgumentError`
+
 ## 0.1.0
 
 ### Features

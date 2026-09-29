@@ -4,17 +4,36 @@ import 'package:test/test.dart';
 import 'package:haudiotagger_interface/haudiotagger_interface.dart';
 
 class _FakeBackend implements FingerprintBackend {
-  @override
-  Future<AudioFingerprint> fingerprint(String path) async =>
-      AudioFingerprint(values: Uint32List.fromList([1, 2, 3]), durationSecs: 5);
+  CancellationToken? lastToken;
 
   @override
-  Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes) async =>
-      AudioFingerprint(values: Uint32List.fromList([1, 2, 3]), durationSecs: 5);
+  Future<AudioFingerprint> fingerprint(String path,
+      {CancellationToken? cancellationToken}) async {
+    lastToken = cancellationToken;
+    return AudioFingerprint(
+        values: Uint32List.fromList([1, 2, 3]), durationSecs: 5);
+  }
+
+  @override
+  Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes,
+      {CancellationToken? cancellationToken}) async {
+    lastToken = cancellationToken;
+    return AudioFingerprint(
+        values: Uint32List.fromList([1, 2, 3]), durationSecs: 5);
+  }
 
   @override
   Future<double> similarity(AudioFingerprint a, AudioFingerprint b) async =>
       1.0;
+}
+
+class _FakeToken implements CancellationToken {
+  bool cancelled = false;
+
+  @override
+  Future<void> cancel() async {
+    cancelled = true;
+  }
 }
 
 void main() {
@@ -34,5 +53,16 @@ void main() {
       await FingerprintRegistry.instance.similarity(fp, fp),
       1.0,
     );
+  });
+
+  test('cancellation token flows through the registry', () async {
+    final backend = _FakeBackend();
+    FingerprintRegistry.instance = backend;
+    final token = _FakeToken();
+    await FingerprintRegistry.instance
+        .fingerprintFromBytes(Uint8List(0), cancellationToken: token);
+    expect(backend.lastToken, same(token));
+    await token.cancel();
+    expect(token.cancelled, isTrue);
   });
 }
