@@ -1,21 +1,16 @@
-name: Publish
+name: Publish to pub.dev
 
 # Publishes the pure-Dart contract package. No native builds needed.
-# Tag as v<version>, e.g. v0.1.0 (must match pubspec.yaml). Requires
+# Tag as v<version>, e.g. v0.2.0 (must match pubspec.yaml). Requires
 # pub.dev trusted publishing (OIDC) configured for haudiotagger_interface.
 
 on:
   push:
     tags:
-      - "v*"
-
-permissions:
-  contents: read
-  id-token: write
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
-  publish:
-    name: Publish to pub.dev
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -32,4 +27,11 @@ jobs:
       - run: dart pub get
       - run: dart analyze --fatal-infos
       - run: dart test
-      - run: dart pub publish --force
+
+  publish:
+    needs: validate
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+    # with:
+    #   working-directory: path/to/package/within/repository
