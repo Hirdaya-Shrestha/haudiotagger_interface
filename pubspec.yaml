@@ -1,6 +1,6 @@
 name: haudiotagger_interface
 description: Shared contract/interface for haudiotagger. DTOs and backend registry - no native code, zero weight. Consumed by haudiotagger.
-version: 0.2.0
+version: 0.3.0
 homepage: https://github.com/Hirdaya-Shrestha/haudiotagger_interface
 repository: https://github.com/Hirdaya-Shrestha/haudiotagger_interface
 

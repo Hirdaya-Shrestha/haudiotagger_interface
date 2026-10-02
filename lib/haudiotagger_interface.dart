@@ -22,6 +22,10 @@ abstract interface class FingerprintBackend {
   Future<AudioFingerprint> fingerprintFromBytes(Uint8List bytes,
       {CancellationToken? cancellationToken});
   Future<double> similarity(AudioFingerprint a, AudioFingerprint b);
+
+  /// Score how much of `clip` is contained in `haystack`, `0.0` to `1.0`.
+  /// Directional — pass the full audio as `haystack`, the excerpt as `clip`.
+  Future<double> contains(AudioFingerprint haystack, AudioFingerprint clip);
 }
 
 /// Cooperative cancellation handle for long fingerprint scans.
@@ -69,5 +73,10 @@ class _UnimplementedBackend implements FingerprintBackend {
 
   @override
   Future<double> similarity(AudioFingerprint a, AudioFingerprint b) async =>
+      _throw();
+
+  @override
+  Future<double> contains(
+          AudioFingerprint haystack, AudioFingerprint clip) async =>
       _throw();
 }

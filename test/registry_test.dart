@@ -25,6 +25,11 @@ class _FakeBackend implements FingerprintBackend {
   @override
   Future<double> similarity(AudioFingerprint a, AudioFingerprint b) async =>
       1.0;
+
+  @override
+  Future<double> contains(
+          AudioFingerprint haystack, AudioFingerprint clip) async =>
+      0.9;
 }
 
 class _FakeToken implements CancellationToken {
@@ -64,5 +69,14 @@ void main() {
     expect(backend.lastToken, same(token));
     await token.cancel();
     expect(token.cancelled, isTrue);
+  });
+
+  test('contains delegates through the registry', () async {
+    FingerprintRegistry.instance = _FakeBackend();
+    final fp = await FingerprintRegistry.instance.fingerprint('a.mp3');
+    expect(
+      await FingerprintRegistry.instance.contains(fp, fp),
+      0.9,
+    );
   });
 }

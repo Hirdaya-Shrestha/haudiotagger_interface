@@ -1,3 +1,9 @@
+## 0.3.0
+
+### Features
+
+- `FingerprintBackend.contains(haystack, clip)` contract for clip lookup: scores how much of an excerpt is inside a longer recording (`0.0` to `1.0`, directional). The uninstalled-backend stub throws the same helpful error for it
+
 ## 0.2.0
 
 ### Features
